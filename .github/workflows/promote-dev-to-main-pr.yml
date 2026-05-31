@@ -3,16 +3,24 @@ name: Promote Dev To Main PR
 on:
   push:
     branches: [dev]
+  pull_request:
+    branches: [dev]
+    types: [closed]
 
 permissions:
   contents: read
   pull-requests: write
+
+concurrency:
+  group: promote-dev-to-main-${{ github.repository }}
+  cancel-in-progress: false
 
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
 jobs:
   open-promotion-pr:
+    if: ${{ github.event_name == 'push' || github.event.pull_request.merged == true }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5

@@ -77,3 +77,5 @@ Rules for AI edits:
 - `src/editable/theme/editable-global.css` - full-site background, selection, scrollbar, and article-global visual CSS.
 
 Automation smoke test: feature to dev to main flow verified on 2026-05-31.
+
+Clean automation flow test: editable-only PR created on 2026-05-31.

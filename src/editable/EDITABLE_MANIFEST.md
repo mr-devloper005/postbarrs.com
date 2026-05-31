@@ -75,3 +75,5 @@ Rules for AI edits:
 - Prefer editing sections/cards instead of touching fetch logic.
 
 - `src/editable/theme/editable-global.css` - full-site background, selection, scrollbar, and article-global visual CSS.
+
+Automation smoke test: feature to dev to main flow verified on 2026-05-31.

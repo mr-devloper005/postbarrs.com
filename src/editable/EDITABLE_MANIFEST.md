@@ -79,3 +79,5 @@ Rules for AI edits:
 Automation smoke test: feature to dev to main flow verified on 2026-05-31.
 
 Clean automation flow test: editable-only PR created on 2026-05-31.
+
+Direct promotion flow test: editable-only PR created on 2026-05-31.

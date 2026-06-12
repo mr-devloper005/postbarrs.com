@@ -89,13 +89,13 @@ export default function CommentsPage() {
   return (
     <EditableSiteShell>
       <main className="mx-auto max-w-6xl px-4 py-10 sm:px-6 lg:px-8">
-        <section className="rounded-[1.8rem] border border-[var(--editable-border)] bg-white p-6 shadow-sm sm:p-8">
+        <section className="rounded-[2rem] border border-[var(--editable-border)] bg-white p-6 shadow-[var(--editable-shadow)] sm:p-8">
           <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
             <div>
-              <p className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.24em] text-[var(--slot4-accent)]">
+              <p className="inline-flex items-center gap-2 text-xs font-black uppercase tracking-[0.24em] text-[var(--slot4-accent)]">
                 <MessageSquare className="h-4 w-4" /> Reader activity
               </p>
-              <h1 className="mt-4 font-serif text-4xl font-semibold tracking-tight sm:text-5xl">Comments</h1>
+              <h1 className="mt-4 font-['Georgia','Times_New_Roman',serif] text-4xl font-bold tracking-tight sm:text-5xl">Comments</h1>
               <p className="mt-4 max-w-2xl text-sm leading-7 text-[var(--slot4-muted-text)]">Review local comments posted from article detail pages.</p>
             </div>
             <button type="button" className="rounded-full border border-[var(--editable-border)] px-4 py-2 text-sm font-bold" onClick={refreshComments}>Refresh</button>
@@ -104,7 +104,7 @@ export default function CommentsPage() {
           <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div className="relative w-full sm:max-w-md">
               <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--slot4-muted-text)]" />
-              <input value={query} onChange={(event) => { setQuery(event.target.value); setPage(1) }} placeholder="Search comments" className="h-11 w-full rounded-2xl border border-[var(--editable-border)] bg-white pl-9 pr-3 text-sm outline-none" />
+              <input value={query} onChange={(event) => { setQuery(event.target.value); setPage(1) }} placeholder="Search comments" className="h-11 w-full rounded-[1.1rem] border border-[var(--editable-border)] bg-white pl-9 pr-3 text-sm outline-none" />
             </div>
             <p className="text-sm text-[var(--slot4-muted-text)]">{filtered.length} comment{filtered.length === 1 ? '' : 's'}</p>
           </div>
@@ -113,7 +113,7 @@ export default function CommentsPage() {
         {visibleComments.length ? (
           <section className="mt-8 grid gap-4">
             {visibleComments.map((item) => (
-              <article key={`${item.articleSlug}-${item.id}`} className="rounded-[1.25rem] border border-[var(--editable-border)] bg-white p-5 shadow-sm">
+              <article key={`${item.articleSlug}-${item.id}`} className="rounded-[1.4rem] border border-[var(--editable-border)] bg-white p-5 shadow-[var(--editable-shadow)]">
                 <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
                   <div>
                     <p className="font-bold text-[var(--slot4-page-text)]">{item.name}</p>
@@ -127,8 +127,8 @@ export default function CommentsPage() {
             ))}
           </section>
         ) : (
-          <section className="mt-8 rounded-[1.25rem] border border-dashed border-[var(--editable-border)] bg-white p-8 text-center">
-            <h2 className="font-serif text-2xl font-semibold text-[var(--slot4-page-text)]">No comments yet</h2>
+          <section className="mt-8 rounded-[1.4rem] border border-dashed border-[var(--editable-border)] bg-white p-8 text-center">
+            <h2 className="font-['Georgia','Times_New_Roman',serif] text-2xl font-bold text-[var(--slot4-page-text)]">No comments yet</h2>
             <p className="mt-2 text-sm text-[var(--slot4-muted-text)]">Add a comment on an article page and it will show here.</p>
           </section>
         )}

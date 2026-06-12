@@ -1,6 +1,6 @@
 # Slot 4 Editable Manifest
 
-This folder is the only safe UI customization surface for Slot 4 sites.
+This folder is the safe customization surface for the Postbarrs.com redesign.
 
 ## Allowed To Edit
 
@@ -8,6 +8,10 @@ This folder is the only safe UI customization surface for Slot 4 sites.
 - `src/editable/content/**`
 - `src/editable/theme/**`
 - `src/editable/components/**`
+- `src/editable/cards/**`
+- `src/editable/sections/**`
+- `src/editable/shell/**`
+- `src/editable/layouts/**`
 
 ## Do Not Edit
 
@@ -23,61 +27,38 @@ This folder is the only safe UI customization surface for Slot 4 sites.
 - `package.json`
 - lockfiles
 
-## AI Redesign Workflow
+## Current Direction
 
-Give AI only this folder unless a build error requires more context.
-Ask for complete drop-in files only.
-Keep all exported component names and props compatible.
-Do not remove post loops, links, contact form, metadata exports, or task detail behavior.
+- Premium luxury editorial desk
+- Showcase-style homepage with layered hero and demo-style preview area
+- Green palette anchored to `#4B5945`, `#66785F`, `#91AC8F`, `#B2C9AD`
+- Mixed card rhythm across featured, horizontal, compact, editorial list, and image-first layouts
 
-## Recommended AI Upload Set
+## Required Rules
 
-For a full redesign:
+- Keep all exported component names and props compatible.
+- Keep post loops, task support, links, metadata exports, and detail behavior intact.
+- Use safe fallbacks when image, summary, category, or optional fields are missing.
+- Keep edits inside `src/editable/` only.
 
-- `src/editable/pages/**`
-- `src/editable/content/pages.content.ts`
-- `src/editable/content/global.content.ts
-- `src/editable/content/tasks.config.ts``
-- `src/editable/content/tasks.config.ts`
-- `src/editable/theme/brand.config.ts`
-- `src/editable/theme/visual-system.ts`
-- `src/editable/components/LoadingStates.tsx`
-- `src/editable/components/EmptyStates.tsx`
-
-## Required Checks
-
-Run before PR:
-
-```bash
-pnpm guard:editable
-pnpm build
-```
-
-## AI-Safe Layout V2
-
-For full visual redesigns, edit these files first:
+## AI-Safe Layout Files
 
 - `src/editable/sections/HomeSections.tsx`
-- `src/editable/sections/ArticleSections.tsx`
+- `src/editable/pages/TaskArchivePage.tsx`
+- `src/editable/pages/TaskDetailPage.tsx`
 - `src/editable/cards/PostCards.tsx`
 - `src/editable/layouts/design-contract.ts`
 - `src/editable/theme/brand.config.ts`
 - `src/editable/theme/visual-system.ts`
+- `src/editable/theme/editable-global.css`
 - `src/editable/content/pages.content.ts`
 - `src/editable/content/task-pages.content.ts`
 
-Rules for AI edits:
+## Checks
 
-- Keep page files as data/composition shells.
-- Do not remove required exports from page files.
-- Do not replace dynamic `posts` props with static arrays.
-- Do not make cards narrower than `min-w-[280px]`.
-- Prefer editing sections/cards instead of touching fetch logic.
+Run before finishing:
 
-- `src/editable/theme/editable-global.css` - full-site background, selection, scrollbar, and article-global visual CSS.
-
-Automation smoke test: feature to dev to main flow verified on 2026-05-31.
-
-Clean automation flow test: editable-only PR created on 2026-05-31.
-
-Direct promotion flow test: editable-only PR created on 2026-05-31.
+```bash
+pnpm guard:editable
+pnpm exec tsc --noEmit
+```

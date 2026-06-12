@@ -1,6 +1,6 @@
-import { TaskListPage } from '@/components/tasks/task-list-page'
 import { buildTaskMetadata } from '@/lib/seo'
 import { taskPageMetadata } from '@/config/site.content'
+import { EditableTaskArchiveRoute } from '@/editable/pages/TaskArchivePage'
 
 export const revalidate = 3
 
@@ -18,9 +18,7 @@ export async function PdfTaskPage({
   searchParams?: Promise<{ category?: string; page?: string }>
   basePath?: string
 }) {
-  const resolved = (await searchParams) || {}
-  const page = Math.max(1, Math.floor(Number(resolved.page) || 1))
-  return <TaskListPage task="pdf" category={resolved.category} page={page} basePath={basePath} />
+  return <EditableTaskArchiveRoute task="pdf" searchParams={searchParams} basePath={basePath} />
 }
 
 export default PdfTaskPage

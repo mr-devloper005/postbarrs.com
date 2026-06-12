@@ -1,4 +1,4 @@
-import type { TaskKey } from "@/lib/site-config";
+import type { TaskKey } from '@/lib/site-config'
 
 export const slot4TaskSupport = {
   article: true,
@@ -8,14 +8,14 @@ export const slot4TaskSupport = {
   pdf: false,
   listing: false,
   image: false,
-} satisfies Record<TaskKey, boolean>;
+} satisfies Record<TaskKey, boolean>
 
 export const slot4TaskNotes = {
-  article: "Article pages and article detail backlinks",
-  classified: "Classified ads pages and detail backlinks",
-  sbm: "Social bookmarking pages and detail backlinks",
-  profile: "Profile/user pages",
-  pdf: "PDF/document pages and detail backlinks",
-  listing: "Business listing pages and detail backlinks",
-  image: "Image/gallery pages and detail backlinks",
-} satisfies Record<TaskKey, string>;
+  article: 'Editorial archive and long-form article detail views',
+  classified: 'Offer and notice pages with quick-scan detail panels',
+  sbm: 'Curated bookmark shelves and resource detail pages',
+  profile: 'Profile and identity-led detail pages',
+  pdf: 'Document archive cards and PDF detail views',
+  listing: 'Directory-style cards and listing detail pages',
+  image: 'Gallery archive layouts and visual detail pages',
+} satisfies Record<TaskKey, string>

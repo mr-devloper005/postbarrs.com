@@ -1,6 +1,6 @@
 import { buildPostMetadata, buildTaskMetadata } from '@/lib/seo'
 import { fetchTaskPostBySlug } from '@/lib/task-data'
-import { EditableArticleDetailShell } from '@/editable/sections/ArticleSections'
+import { EditableTaskDetailRoute } from '@/editable/pages/TaskDetailPage'
 
 export const revalidate = 3
 
@@ -15,7 +15,5 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 }
 
 export default async function ArticleDetailPage({ params }: { params: Promise<{ slug: string }> }) {
-  const resolvedParams = await params
-  const post = await fetchTaskPostBySlug('article', resolvedParams.slug)
-  return <EditableArticleDetailShell slug={resolvedParams.slug} post={post} />
+  return <EditableTaskDetailRoute task="article" params={params} />
 }

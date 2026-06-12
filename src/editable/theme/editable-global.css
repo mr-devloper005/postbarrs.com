@@ -14,53 +14,112 @@ main::before {
   position: absolute;
   inset: 0;
   pointer-events: none;
-  background-image:
-    linear-gradient(rgba(0, 0, 0, 0.03) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(0, 0, 0, 0.03) 1px, transparent 1px);
-  background-size: 28px 28px;
-  opacity: 0.18;
+  background:
+    radial-gradient(circle at top, rgba(178, 201, 173, 0.14), transparent 26%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.2), transparent 18%);
+  opacity: 0.9;
 }
 
 ::selection {
-  background: color-mix(in oklab, var(--slot4-accent-fill) 28%, transparent);
+  background: color-mix(in oklab, var(--slot4-accent-fill) 26%, white);
   color: var(--slot4-page-text);
+}
+
+::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
 }
 
 ::-webkit-scrollbar-track {
-  background: color-mix(in oklab, var(--slot4-page-bg) 86%, white);
+  background: color-mix(in oklab, var(--slot4-page-bg) 88%, white);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: color-mix(in oklab, var(--slot4-accent) 44%, transparent);
+  background: color-mix(in oklab, var(--slot4-accent-fill) 56%, transparent);
   border-radius: 999px;
+  border: 2px solid color-mix(in oklab, var(--slot4-page-bg) 88%, white);
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: color-mix(in oklab, var(--slot4-accent) 62%, transparent);
+  background: color-mix(in oklab, var(--slot4-accent) 72%, transparent);
+}
+
+.article-content {
+  color: color-mix(in oklab, var(--slot4-page-text) 88%, white);
+  width: 100%;
+  max-width: none;
+}
+
+.article-content > * {
+  max-width: none !important;
+}
+
+.article-content :where(div, section, article, aside, figure, header, footer) {
+  width: 100% !important;
+  max-width: none !important;
+  float: none !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+}
+
+.article-content :where(p, h2, h3, h4, ul, ol, blockquote) {
+  width: 100%;
+  max-width: none !important;
 }
 
 .article-content h2,
-.article-content h3 {
+.article-content h3,
+.article-content h4 {
   font-family: Georgia, 'Times New Roman', serif;
   color: var(--slot4-page-text);
-  margin-top: 1.8rem;
-  margin-bottom: 0.9rem;
+  margin-top: 2rem;
+  margin-bottom: 0.85rem;
+  letter-spacing: -0.03em;
+}
+
+.article-content p,
+.article-content li,
+.article-content blockquote {
+  font-size: 1.02rem;
+  line-height: 1.9;
+}
+
+.article-content blockquote {
+  margin: 1.5rem 0;
+  border-left: 3px solid var(--slot4-accent-fill);
+  padding-left: 1rem;
+  color: var(--slot4-muted-text);
 }
 
 .article-content a {
   color: var(--slot4-accent-fill);
-  text-underline-offset: 0.2em;
+  text-underline-offset: 0.22em;
 }
 
 .slot4-fade-up {
   animation: slot4FadeUp 420ms ease-out both;
 }
 
+.slot4-shell-wave::before {
+  content: '';
+  position: absolute;
+  left: -8%;
+  right: -8%;
+  top: 0;
+  height: 180px;
+  border-bottom-left-radius: 55% 100%;
+  border-bottom-right-radius: 55% 100%;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.88), rgba(255, 255, 255, 0.35));
+  opacity: 0.9;
+  pointer-events: none;
+}
+
 @keyframes slot4FadeUp {
   from {
     opacity: 0;
-    transform: translateY(8px);
+    transform: translateY(10px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);

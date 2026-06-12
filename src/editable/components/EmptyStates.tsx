@@ -18,13 +18,13 @@ export function EmptyState({
   className,
 }: EmptyStateProps) {
   return (
-    <section className={cn('rounded-[1.8rem] border border-[var(--editable-border)] bg-white p-8 text-center shadow-sm', className)}>
+    <section className={cn('rounded-[2rem] border border-[var(--editable-border)] bg-white/84 p-8 text-center shadow-[var(--editable-shadow)] backdrop-blur-sm', className)}>
       <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-[var(--slot4-accent-soft)] text-[var(--slot4-accent)]">
         <SearchX className="h-6 w-6" />
       </div>
-      <h2 className="mt-5 font-serif text-3xl font-semibold tracking-tight">{title}</h2>
-      <p className="mx-auto mt-3 max-w-xl text-sm leading-7 text-[var(--slot4-muted-text)]">{description}</p>
-      <Link href={actionHref} className="mt-6 inline-flex items-center gap-2 rounded-full border border-[var(--editable-border)] px-5 py-3 text-sm font-semibold transition hover:bg-[var(--slot4-page-text)] hover:text-white">
+      <h2 className="mt-5 font-['Georgia','Times_New_Roman',serif] text-3xl font-bold tracking-tight text-[var(--slot4-page-text)]">{title}</h2>
+      <p className="mx-auto mt-3 max-w-xl text-sm leading-8 text-[var(--slot4-muted-text)]">{description}</p>
+      <Link href={actionHref} className="mt-6 inline-flex items-center gap-2 rounded-full border border-[var(--editable-border)] bg-white px-5 py-3 text-sm font-black uppercase tracking-[0.12em] transition hover:bg-[var(--slot4-page-text)] hover:text-white">
         {actionLabel}
         <ArrowRight className="h-4 w-4" />
       </Link>
@@ -37,7 +37,7 @@ export function TaskEmptyState({ taskLabel = 'posts', className }: { taskLabel?:
     <EmptyState
       className={className}
       title={`No ${taskLabel} available yet`}
-      description={`Published ${taskLabel} will appear here automatically. This layout remains ready for incoming content.`}
+      description={`Published ${taskLabel} will appear here automatically. This archive is ready whenever new content arrives.`}
       actionLabel="Explore the site"
       actionHref="/"
     />

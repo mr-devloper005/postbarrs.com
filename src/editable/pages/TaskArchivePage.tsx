@@ -1,10 +1,10 @@
 import Link from 'next/link'
 import type { CSSProperties } from 'react'
-import { ArrowRight, Bookmark, BriefcaseBusiness, Building2, Camera, Download, FileText, Filter, Image as ImageIcon, MapPin, Megaphone, Search, Sparkles, UserRound } from 'lucide-react'
+import { ArrowRight, Bookmark, BriefcaseBusiness, Building2, Camera, Download, FileText, Filter, Image as ImageIcon, MapPin, Megaphone, Search, UserRound } from 'lucide-react'
 import { buildTaskMetadata } from '@/lib/seo'
 import { CATEGORY_OPTIONS, normalizeCategory } from '@/lib/categories'
 import { fetchPaginatedTaskPosts, buildPostUrl } from '@/lib/task-data'
-import { getTaskConfig, SITE_CONFIG, type TaskKey } from '@/lib/site-config'
+import { getTaskConfig, type TaskKey } from '@/lib/site-config'
 import type { SiteFeedPagination, SitePost } from '@/lib/site-connector'
 import { taskPageMetadata } from '@/config/site.content'
 import { taskPageVoices } from '@/editable/content/task-pages.content'
@@ -36,9 +36,22 @@ const getImages = (post: SitePost) => {
 const placeholder = '/placeholder.svg?height=900&width=1200'
 const getImage = (post: SitePost) => getImages(post)[0] || placeholder
 const getCategory = (post: SitePost, fallback: string) => asText(getContent(post).category) || post.tags?.[0] || fallback
-const getSummary = (post: SitePost) => {
-  const summary = post.summary || asText(getContent(post).description) || asText(getContent(post).excerpt) || asText(getContent(post).body)
-  return summary || 'Open this post to view the full details.'
+const stripHtml = (value: string) => {
+  let s = value
+  for (let i = 0; i < 2; i++) {
+    s = s
+      .replace(/&#(\d+);/g, (_m: string, code: string) => String.fromCharCode(Number(code)))
+      .replace(/&#x([0-9a-f]+);/gi, (_m: string, hex: string) => String.fromCharCode(parseInt(hex, 16)))
+      .replace(/&amp;/gi, '&').replace(/&quot;/gi, '"').replace(/&#39;/g, "'").replace(/&lt;/gi, '<').replace(/&gt;/gi, '>')
+      .replace(/<[^>]*>/g, ' ')
+  }
+  return s.replace(/\s+/g, ' ').trim()
+}
+const getSummary = (post: SitePost, limit = 220) => {
+  const raw = post.summary || asText(getContent(post).description) || asText(getContent(post).excerpt) || asText(getContent(post).body)
+  if (!raw) return 'Open this post to view the full details.'
+  const clean = stripHtml(raw)
+  return clean.length > limit ? `${clean.slice(0, limit).trim()}...` : clean
 }
 const getField = (post: SitePost, keys: string[]) => {
   const content = getContent(post)
@@ -89,7 +102,6 @@ export function TaskArchiveView({ task, posts, pagination, category, basePath }:
   const voice = taskPageVoices[task]
   const preset = getVisualPreset(visualSystem.recommendedPreset as any)
   const page = pagination.page || 1
-  const label = taskConfig?.label || task
   const deck = taskDeck[task]
   const Icon = deck.icon
   const archiveVars = {
@@ -104,8 +116,8 @@ export function TaskArchiveView({ task, posts, pagination, category, basePath }:
   return (
     <EditableSiteShell>
       <main style={archiveVars} className="bg-[var(--archive-bg)] text-[var(--archive-text)]">
-        <section className={`relative overflow-hidden border-b border-[var(--editable-border)] ${isArticle ? 'bg-[linear-gradient(180deg,rgba(255,255,255,0.25),rgba(255,255,255,0))]' : 'slot4-shell-wave'}`}>
-          <div className="mx-auto grid max-w-[var(--editable-container)] gap-8 px-4 py-12 sm:px-6 lg:grid-cols-[1fr_0.92fr] lg:px-8 lg:py-16">
+        <section className={`relative overflow-hidden border-b border-[var(--editable-border)] ${isArticle ? 'bg-[#fafaf8]' : 'slot4-shell-wave'}`}>
+          <div className="mx-auto grid max-w-[var(--editable-container)] gap-8 px-4 py-12 sm:px-6 lg:grid-cols-[1fr_340px] lg:px-8 lg:py-16">
             {isArticle ? (
               <ArticleArchiveHero voice={voice} posts={posts} basePath={basePath} categoryLabel={categoryLabel} />
             ) : (
@@ -130,12 +142,12 @@ export function TaskArchiveView({ task, posts, pagination, category, basePath }:
               </div>
             )}
 
-            <div className="relative z-10 rounded-[2rem] border border-[var(--editable-border)] bg-white/82 p-5 shadow-[var(--editable-shadow)] backdrop-blur">
-              <form action={basePath} className="rounded-[1.6rem] border border-[var(--editable-border)] bg-[var(--slot4-warm)] p-5">
-                <div className="flex items-center gap-2 text-xs font-black uppercase tracking-[0.2em] opacity-55">
+            <div className="relative z-10">
+              <form action={basePath} className="rounded-2xl border border-[var(--editable-border)] bg-white p-6 shadow-sm">
+                <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.16em] text-[var(--archive-accent)]">
                   <Filter className="h-4 w-4" /> {voice.filterLabel}
                 </div>
-                <select name="category" defaultValue={category} className="mt-4 h-12 w-full rounded-[1rem] border border-[var(--editable-border)] bg-white px-4 text-sm font-bold outline-none">
+                <select name="category" defaultValue={category} className="mt-4 h-11 w-full rounded-lg border border-[var(--editable-border)] bg-[var(--archive-bg)] px-4 text-sm font-medium outline-none transition focus:border-[var(--archive-accent)] focus:ring-1 focus:ring-[var(--archive-accent)]">
                   <option value="all">All categories</option>
                   {CATEGORY_OPTIONS.map((item) => (
                     <option key={item.slug} value={item.slug}>
@@ -143,26 +155,11 @@ export function TaskArchiveView({ task, posts, pagination, category, basePath }:
                     </option>
                   ))}
                 </select>
-                <button className="mt-3 h-12 w-full rounded-[1rem] bg-[var(--archive-text)] text-sm font-black uppercase tracking-[0.12em] text-[var(--archive-bg)]">
+                <button className="mt-3 h-11 w-full rounded-lg bg-[var(--archive-text)] text-sm font-semibold tracking-wide text-[var(--archive-bg)] transition hover:opacity-90">
                   Apply filter
                 </button>
-                <p className="mt-3 text-xs font-bold opacity-55">Showing: {categoryLabel}</p>
+                <p className="mt-3 text-xs text-[var(--archive-text)]/50">Showing: {categoryLabel}</p>
               </form>
-
-              <div className="mt-4 grid gap-3 sm:grid-cols-2">
-                <div className="rounded-[1rem] border border-[var(--editable-border)] bg-white p-4">
-                  <p className="text-[10px] font-black uppercase tracking-[0.16em] opacity-55">Collection</p>
-                  <p className="mt-1 text-sm font-bold">{label}</p>
-                </div>
-                <div className="rounded-[1rem] border border-[var(--editable-border)] bg-white p-4">
-                  <p className="text-[10px] font-black uppercase tracking-[0.16em] opacity-55">Current topic</p>
-                  <p className="mt-1 truncate text-sm font-bold">{categoryLabel}</p>
-                </div>
-                <div className="rounded-[1rem] border border-[var(--editable-border)] bg-white p-4 sm:col-span-2">
-                  <p className="text-[10px] font-black uppercase tracking-[0.16em] opacity-55">Layout note</p>
-                  <p className="mt-1 text-sm leading-7 opacity-70">{deck.promise}</p>
-                </div>
-              </div>
             </div>
           </div>
         </section>
@@ -207,7 +204,6 @@ function ArticleArchiveHero({
   voice,
   posts,
   basePath,
-  categoryLabel,
 }: {
   voice: { eyebrow: string; headline: string; description: string; chips: string[] }
   posts: SitePost[]
@@ -219,62 +215,47 @@ function ArticleArchiveHero({
 
   return (
     <div className="relative z-10">
-      <div className="inline-flex items-center gap-2 rounded-full border border-[var(--editable-border)] bg-white/86 px-4 py-2 text-xs font-black uppercase tracking-[0.22em] text-[var(--archive-accent)] shadow-sm">
-        <Sparkles className="h-4 w-4" /> {voice.eyebrow}
-      </div>
-      <h1 className="mt-6 max-w-5xl font-['Georgia','Times_New_Roman',serif] text-5xl font-bold leading-[0.9] tracking-[-0.07em] sm:text-6xl lg:text-[4.9rem]">
+      <span className="inline-block rounded-md bg-[var(--archive-accent)]/10 px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.14em] text-[var(--archive-accent)]">
+        {voice.eyebrow}
+      </span>
+      <h1 className="mt-5 max-w-5xl font-['Georgia','Times_New_Roman',serif] text-5xl font-bold leading-[0.92] tracking-[-0.04em] text-[var(--archive-text)] sm:text-6xl lg:text-[4.5rem]">
         {voice.headline}
       </h1>
-      <p className="mt-6 max-w-2xl text-base leading-8 opacity-74">{voice.description}</p>
-      <div className="mt-7 flex flex-wrap gap-3">
-        {voice.chips.map((chip) => (
-          <span key={chip} className="rounded-full border border-[var(--editable-border)] bg-white/80 px-4 py-2 text-xs font-black uppercase tracking-[0.16em]">
-            {chip}
-          </span>
-        ))}
-      </div>
-      <div className="mt-9 flex flex-wrap gap-3">
-        <Link href="/search" className="rounded-full bg-[var(--archive-text)] px-6 py-3 text-sm font-black uppercase tracking-[0.12em] text-[var(--archive-bg)]">
-          Search posts
-        </Link>
-        <Link href={basePath} className="rounded-full border border-[var(--editable-border)] bg-white px-6 py-3 text-sm font-black uppercase tracking-[0.12em]">
-          {categoryLabel}
-        </Link>
-      </div>
+      <p className="mt-5 max-w-2xl text-base leading-7 text-[var(--archive-text)]/65">{voice.description}</p>
+
       {feature ? (
-        <div className="mt-10 overflow-hidden rounded-[2.2rem] border border-[var(--editable-border)] bg-white/84 p-4 shadow-[var(--editable-shadow)] backdrop-blur">
-          <div className="grid gap-4 lg:grid-cols-[1.18fr_0.82fr]">
-            <Link href={`${basePath}/${feature.slug}`} className="group relative min-h-[360px] overflow-hidden rounded-[1.7rem] bg-black/10">
-              <img src={getImage(feature)} alt="" className="h-full w-full object-cover transition duration-700 group-hover:scale-105" />
-              <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(20,26,22,0.06),rgba(20,26,22,0.82))]" />
-              <div className="absolute inset-x-0 bottom-0 p-6 sm:p-8">
-                <span className="rounded-full bg-white px-3 py-1 text-[10px] font-black uppercase tracking-[0.18em] text-[var(--archive-text)]">
-                  Cover story
-                </span>
-                <h2 className="mt-4 max-w-2xl font-['Georgia','Times_New_Roman',serif] text-3xl font-bold leading-tight tracking-[-0.04em] text-white sm:text-4xl">
-                  {feature.title}
-                </h2>
-                <p className="mt-3 max-w-xl line-clamp-3 text-sm leading-7 text-white/78">{getSummary(feature)}</p>
-              </div>
-            </Link>
-            <div className="grid gap-3">
-              {supporting.map((post, index) => (
-                <Link
-                  key={`${post.id || post.slug}-${index}`}
-                  href={`${basePath}/${post.slug}`}
-                  className="group grid gap-4 rounded-[1.45rem] border border-[var(--editable-border)] bg-white p-4 shadow-sm transition hover:-translate-y-1 sm:grid-cols-[100px_minmax(0,1fr)]"
-                >
-                  <div className="relative aspect-[4/3] overflow-hidden rounded-[1rem] bg-black/5">
-                    <img src={getImage(post)} alt="" className="h-full w-full object-cover transition duration-500 group-hover:scale-105" />
-                  </div>
-                  <div className="min-w-0">
-                    <p className="text-[10px] font-black uppercase tracking-[0.18em] text-[var(--archive-accent)]">{getCategory(post, 'Article')}</p>
-                    <h3 className="mt-2 line-clamp-2 text-xl font-black leading-tight tracking-[-0.04em]">{post.title}</h3>
-                    <p className="mt-2 line-clamp-2 text-sm leading-6 opacity-65">{getSummary(post)}</p>
-                  </div>
-                </Link>
-              ))}
+        <div className="mt-10 grid gap-5 lg:grid-cols-[1.2fr_0.8fr]">
+          <Link href={`${basePath}/${feature.slug}`} className="group relative min-h-[380px] overflow-hidden rounded-2xl bg-black/10">
+            <img src={getImage(feature)} alt="" className="h-full w-full object-cover transition duration-700 group-hover:scale-105" />
+            <div className="absolute inset-0 bg-[linear-gradient(180deg,transparent_30%,rgba(15,20,17,0.85))]" />
+            <div className="absolute inset-x-0 bottom-0 p-7 sm:p-9">
+              <span className="inline-block rounded-md bg-[var(--archive-accent)] px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-white">
+                {getCategory(feature, 'Featured')}
+              </span>
+              <h2 className="mt-4 max-w-xl font-['Georgia','Times_New_Roman',serif] text-3xl font-bold leading-[1.1] tracking-[-0.02em] text-white sm:text-4xl">
+                {feature.title}
+              </h2>
+              <p className="mt-3 max-w-lg line-clamp-2 text-sm leading-6 text-white/75">{getSummary(feature)}</p>
             </div>
+          </Link>
+
+          <div className="grid gap-4 content-start">
+            {supporting.map((post, index) => (
+              <Link
+                key={`${post.id || post.slug}-${index}`}
+                href={`${basePath}/${post.slug}`}
+                className="group grid gap-4 rounded-xl border border-[var(--editable-border)] bg-white p-3.5 transition hover:shadow-md sm:grid-cols-[88px_minmax(0,1fr)]"
+              >
+                <div className="relative aspect-square overflow-hidden rounded-lg bg-black/5">
+                  <img src={getImage(post)} alt="" className="h-full w-full object-cover transition duration-500 group-hover:scale-105" />
+                </div>
+                <div className="min-w-0">
+                  <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-[var(--archive-accent)]">{getCategory(post, 'Article')}</p>
+                  <h3 className="mt-1.5 line-clamp-2 font-['Georgia','Times_New_Roman',serif] text-lg font-bold leading-snug tracking-[-0.02em]">{post.title}</h3>
+                  <p className="mt-1.5 line-clamp-2 text-sm leading-relaxed text-[var(--archive-text)]/55">{getSummary(post, 120)}</p>
+                </div>
+              </Link>
+            ))}
           </div>
         </div>
       ) : null}
@@ -308,17 +289,21 @@ function ArticleArchiveCardUnique({ post, href, index }: { post: SitePost; href:
     return (
       <Link
         href={href}
-        className="group self-start overflow-hidden rounded-[2rem] border border-[var(--editable-border)] bg-[linear-gradient(135deg,rgba(178,201,173,0.28),rgba(255,255,255,0.96))] shadow-[var(--editable-shadow)] transition hover:-translate-y-1 hover:shadow-[var(--editable-shadow-strong)] xl:row-span-2"
+        className="group self-start overflow-hidden rounded-2xl border border-[var(--editable-border)] bg-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-lg xl:row-span-2"
       >
         <div className="relative aspect-[4/3] overflow-hidden">
           <img src={image} alt="" className="h-full w-full object-cover transition duration-700 group-hover:scale-105" />
+          <div className="absolute inset-0 bg-[linear-gradient(180deg,transparent_50%,rgba(0,0,0,0.04))]" />
         </div>
         <div className="p-6">
-          <span className="rounded-full bg-white px-3 py-1 text-[10px] font-black uppercase tracking-[0.18em] text-[var(--archive-accent)]">
-            Editor's pick
+          <span className="inline-block rounded-md bg-[var(--archive-accent)]/10 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-[var(--archive-accent)]">
+            Editor&apos;s pick
           </span>
-          <h2 className="mt-4 font-['Georgia','Times_New_Roman',serif] text-3xl font-bold leading-tight tracking-[-0.04em]">{post.title}</h2>
-          <p className="mt-4 line-clamp-5 text-sm leading-7 opacity-70">{getSummary(post)}</p>
+          <h2 className="mt-3 font-['Georgia','Times_New_Roman',serif] text-2xl font-bold leading-tight tracking-[-0.02em] sm:text-3xl">{post.title}</h2>
+          <p className="mt-3 line-clamp-4 text-sm leading-7 text-[var(--archive-text)]/65">{getSummary(post)}</p>
+          <span className="mt-5 inline-flex items-center gap-1.5 text-sm font-semibold text-[var(--archive-accent)]">
+            Read article <ArrowRight className="h-3.5 w-3.5" />
+          </span>
         </div>
       </Link>
     )
@@ -328,15 +313,15 @@ function ArticleArchiveCardUnique({ post, href, index }: { post: SitePost; href:
     return (
       <Link
         href={href}
-        className="group grid self-start gap-0 overflow-hidden rounded-[2rem] border border-[var(--editable-border)] bg-white shadow-[var(--editable-shadow)] transition hover:-translate-y-1 hover:shadow-[var(--editable-shadow-strong)] md:grid-cols-[220px_minmax(0,1fr)]"
+        className="group grid self-start gap-0 overflow-hidden rounded-2xl border border-[var(--editable-border)] bg-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-lg md:grid-cols-[200px_minmax(0,1fr)]"
       >
-        <div className="relative min-h-[220px] overflow-hidden bg-black/5">
+        <div className="relative min-h-[200px] overflow-hidden bg-black/5">
           <img src={image} alt="" className="h-full w-full object-cover transition duration-700 group-hover:scale-105" />
         </div>
         <div className="p-5">
-          <p className="text-[10px] font-black uppercase tracking-[0.22em] text-[var(--archive-accent)]">{category}</p>
-          <h2 className="mt-2 text-2xl font-black leading-tight tracking-[-0.04em]">{post.title}</h2>
-          <p className="mt-3 line-clamp-4 text-sm leading-6 opacity-65">{getSummary(post)}</p>
+          <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-[var(--archive-accent)]">{category}</p>
+          <h2 className="mt-2 font-['Georgia','Times_New_Roman',serif] text-xl font-bold leading-tight tracking-[-0.02em]">{post.title}</h2>
+          <p className="mt-2.5 line-clamp-3 text-sm leading-6 text-[var(--archive-text)]/60">{getSummary(post)}</p>
         </div>
       </Link>
     )
@@ -345,20 +330,17 @@ function ArticleArchiveCardUnique({ post, href, index }: { post: SitePost; href:
   return (
     <Link
       href={href}
-      className="group self-start overflow-hidden rounded-[1.9rem] border border-[var(--editable-border)] bg-white shadow-[var(--editable-shadow)] transition hover:-translate-y-1 hover:shadow-[var(--editable-shadow-strong)]"
+      className="group self-start overflow-hidden rounded-2xl border border-[var(--editable-border)] bg-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-lg"
     >
       <div className="relative aspect-[5/4] overflow-hidden bg-black/5">
         <img src={image} alt="" className="h-full w-full object-cover transition duration-700 group-hover:scale-105" />
-        <span className="absolute left-4 top-4 rounded-full bg-white/92 px-3 py-1 text-[10px] font-black uppercase tracking-[0.18em] text-[var(--archive-text)]">
-          Story {String(index + 1).padStart(2, '0')}
-        </span>
       </div>
       <div className="p-5">
-        <p className="text-[10px] font-black uppercase tracking-[0.22em] text-[var(--archive-accent)]">{category}</p>
-        <h2 className="mt-2 line-clamp-3 font-['Georgia','Times_New_Roman',serif] text-2xl font-bold leading-tight tracking-[-0.04em]">
+        <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-[var(--archive-accent)]">{category}</p>
+        <h2 className="mt-2 line-clamp-3 font-['Georgia','Times_New_Roman',serif] text-xl font-bold leading-tight tracking-[-0.02em]">
           {post.title}
         </h2>
-        <p className="mt-3 line-clamp-3 text-sm leading-6 opacity-65">{getSummary(post)}</p>
+        <p className="mt-2.5 line-clamp-3 text-sm leading-6 text-[var(--archive-text)]/60">{getSummary(post)}</p>
       </div>
     </Link>
   )

@@ -9,7 +9,7 @@ export const globalContent = {
   },
   nav: {
     tagline: '',
-    announcement: 'Fresh layouts for long reads, galleries, and curated discoveries.',
+    announcement: 'New stories published weekly across articles, visuals, and curated collections.',
     primaryLinks: [
       { label: 'Articles', href: '/article' },
       { label: 'Visuals', href: '/image' },

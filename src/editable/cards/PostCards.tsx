@@ -27,7 +27,15 @@ export function getEditableExcerpt(post?: SitePost | null, limit = 150) {
     (typeof content.summary === 'string' && content.summary) ||
     post?.summary ||
     ''
-  const clean = raw.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim()
+  let s = raw
+  for (let i = 0; i < 2; i++) {
+    s = s
+      .replace(/&#(\d+);/g, (_m: string, code: string) => String.fromCharCode(Number(code)))
+      .replace(/&#x([0-9a-f]+);/gi, (_m: string, hex: string) => String.fromCharCode(parseInt(hex, 16)))
+      .replace(/&amp;/gi, '&').replace(/&quot;/gi, '"').replace(/&#39;/g, "'").replace(/&lt;/gi, '<').replace(/&gt;/gi, '>')
+      .replace(/<[^>]*>/g, ' ')
+  }
+  const clean = s.replace(/\s+/g, ' ').trim()
   return clean.length > limit ? `${clean.slice(0, limit).trim()}...` : clean
 }
 
@@ -61,13 +69,13 @@ export function EditorialFeatureCard({ post, href, label = 'Featured read' }: { 
   )
 }
 
-export function RailPostCard({ post, href, index }: { post: SitePost; href: string; index: number }) {
+export function RailPostCard({ post, href }: { post: SitePost; href: string; index: number }) {
   return (
     <Link href={href} className={`group ${dc.layout.minRailCard} block overflow-hidden ${dc.surface.card} ${dc.motion.lift}`}>
       <div className="relative aspect-[4/3] overflow-hidden rounded-t-[1.8rem] bg-[var(--slot4-media-bg)]">
         <ContentImage src={getEditablePostImage(post)} alt={post.title} fill className="object-cover transition duration-500 group-hover:scale-105" />
         <span className="absolute left-4 top-4 rounded-full bg-white px-3 py-1 text-[10px] font-black uppercase tracking-[0.2em] text-[var(--slot4-page-text)]">
-          Demo {String(index + 1).padStart(2, '0')}
+          {getEditableCategory(post)}
         </span>
       </div>
       <div className="p-5">
@@ -100,14 +108,14 @@ export function CompactIndexCard({ post, href, index }: { post: SitePost; href: 
   )
 }
 
-export function ArticleListCard({ post, href, index }: { post: SitePost; href: string; index: number }) {
+export function ArticleListCard({ post, href }: { post: SitePost; href: string; index: number }) {
   return (
     <Link href={href} className={`group grid min-w-0 gap-5 overflow-hidden ${dc.surface.card} p-4 ${dc.motion.lift} sm:grid-cols-[260px_minmax(0,1fr)]`}>
       <div className={`${dc.media.frame} aspect-[16/12] sm:aspect-auto sm:min-h-[220px]`}>
         <ContentImage src={getEditablePostImage(post)} alt={post.title} fill className="object-cover transition duration-500 group-hover:scale-105" />
       </div>
       <div className="min-w-0 p-2 sm:py-4 sm:pr-5">
-        <p className={`${dc.type.eyebrow} ${pal.accentText}`}>Story {String(index + 1).padStart(2, '0')}</p>
+        <p className={`${dc.type.eyebrow} ${pal.accentText}`}>{getEditableCategory(post)}</p>
         <h2 className="mt-3 line-clamp-3 font-['Georgia','Times_New_Roman',serif] text-[2rem] font-bold leading-tight tracking-[-0.05em] text-[var(--slot4-page-text)] sm:text-[2.35rem]">
           {post.title}
         </h2>

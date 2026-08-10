@@ -2,7 +2,6 @@
 
 import Link from 'next/link'
 import type { CSSProperties } from 'react'
-import { ArrowUpRight } from 'lucide-react'
 import { SITE_CONFIG } from '@/lib/site-config'
 import { globalContent } from '@/editable/content/global.content'
 import { useEditableLocalAuthSession } from '@/editable/components/EditableLocalAuthForms'
@@ -12,47 +11,77 @@ export function EditableFooter() {
     '--editable-footer-bg': 'linear-gradient(180deg, rgba(255,255,255,0.72), rgba(238,241,231,0.95))',
     '--editable-footer-text': 'var(--slot4-page-text)',
   } as CSSProperties
-  const taskLinks = SITE_CONFIG.tasks.filter((task) => task.enabled)
   const year = new Date().getFullYear()
   const { session, logout } = useEditableLocalAuthSession()
 
   return (
     <footer style={footerVars} className="relative overflow-hidden border-t border-[var(--editable-border)] bg-[var(--editable-footer-bg)] text-[var(--editable-footer-text)]">
-      <div className="pointer-events-none absolute inset-x-0 top-0 h-24 bg-[radial-gradient(circle_at_top,rgba(178,201,173,0.35),transparent_55%)]" />
-      <div className="mx-auto grid max-w-[var(--editable-container)] gap-10 px-4 py-14 sm:px-6 lg:grid-cols-[1.2fr_1fr_1fr] lg:px-8">
+      {/* Subtle top gradient accent */}
+      <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#B2C9AD]/50 to-transparent" />
+      <div className="pointer-events-none absolute inset-x-0 top-0 h-32 bg-[radial-gradient(circle_at_top,rgba(178,201,173,0.18),transparent_60%)]" />
+
+      <div className="relative mx-auto grid max-w-[var(--editable-container)] gap-10 px-4 py-14 sm:px-6 lg:grid-cols-[1.4fr_0.8fr_0.8fr] lg:gap-16 lg:px-8">
+        {/* Brand column */}
         <div>
-          <Link href="/" className="inline-flex items-center gap-3">
-            <span className="flex h-12 w-12 items-center justify-center overflow-hidden rounded-2xl border border-[var(--editable-border)] bg-white shadow-sm">
-              <img src="/favicon.png?v=20260413" alt={SITE_CONFIG.name} className="h-9 w-9 object-contain" />
+          <Link href="/" className="inline-flex items-center gap-2.5">
+            <span className="flex h-9 w-9 items-center justify-center overflow-hidden rounded-lg bg-white shadow-sm ring-1 ring-black/[0.06]">
+              <img src="/favicon.png?v=20260413" alt={SITE_CONFIG.name} className="h-7 w-7 object-contain" />
             </span>
-            <span>
-              <span className="block text-2xl font-black tracking-[-0.08em]">{SITE_CONFIG.name.replace('.com', '')}</span>
-              <span className="block text-[11px] font-black uppercase tracking-[0.2em] opacity-55">{globalContent.footer.tagline}</span>
-            </span>
+            <span className="text-xl font-semibold tracking-[-0.03em]">{SITE_CONFIG.name.replace('.com', '')}</span>
           </Link>
-          <p className="mt-4 max-w-md text-sm leading-8 opacity-72">{globalContent.footer.description}</p>
+          <p className="mt-4 max-w-sm text-[14px] leading-relaxed opacity-55">{globalContent.footer.description}</p>
         </div>
 
-        
-
+        {/* Browse column - from globalContent.footer.columns */}
         <div>
-          <h3 className="text-xs font-black uppercase tracking-[0.22em] opacity-55">Site</h3>
-          <div className="mt-4 grid gap-2">
-            {[['About', '/about'], ['Contact', '/contact'], ...(session ? [['Create', '/create']] : [['Login', '/login'], ['Sign up', '/signup']])].map(([label, href]) => (
-              <Link key={href} href={href} className="text-sm font-bold opacity-75 hover:opacity-100">
-                {label}
+          <h3 className="text-[13px] font-semibold tracking-[-0.01em] opacity-40">Browse</h3>
+          <div className="mt-4 grid gap-2.5">
+            {globalContent.footer.columns[0].links.map((link) => (
+              <Link key={link.href} href={link.href} className="text-[14px] font-medium opacity-65 transition-opacity hover:opacity-100">
+                {link.label}
+              </Link>
+            ))}
+          </div>
+        </div>
+
+        {/* Site column */}
+        <div>
+          <h3 className="text-[13px] font-semibold tracking-[-0.01em] opacity-40">Site</h3>
+          <div className="mt-4 grid gap-2.5">
+            {globalContent.footer.columns[1].links.map((link) => (
+              <Link key={link.href} href={link.href} className="text-[14px] font-medium opacity-65 transition-opacity hover:opacity-100">
+                {link.label}
               </Link>
             ))}
             {session ? (
-              <button type="button" onClick={logout} className="text-left text-sm font-bold opacity-75 hover:opacity-100">
-                Logout
-              </button>
-            ) : null}
+              <>
+                <Link href="/create" className="text-[14px] font-medium opacity-65 transition-opacity hover:opacity-100">
+                  Create
+                </Link>
+                <button type="button" onClick={logout} className="text-left text-[14px] font-medium opacity-65 transition-opacity hover:opacity-100">
+                  Logout
+                </button>
+              </>
+            ) : (
+              <>
+                <Link href="/login" className="text-[14px] font-medium opacity-65 transition-opacity hover:opacity-100">
+                  Login
+                </Link>
+                <Link href="/signup" className="text-[14px] font-medium opacity-65 transition-opacity hover:opacity-100">
+                  Sign up
+                </Link>
+              </>
+            )}
           </div>
         </div>
       </div>
-      <div className="border-t border-[var(--editable-border)] px-4 py-5 text-center text-xs font-bold opacity-55">
-        © {year} {SITE_CONFIG.name}. {globalContent.footer.bottomNote}
+
+      {/* Bottom bar */}
+      <div className="relative border-t border-black/[0.06] px-4 py-5 sm:px-6 lg:px-8">
+        <div className="mx-auto flex max-w-[var(--editable-container)] flex-col items-center justify-between gap-2 sm:flex-row">
+          <span className="text-[13px] opacity-40">&copy; {year} {SITE_CONFIG.name}</span>
+          <span className="text-[12px] opacity-30">{globalContent.footer.bottomNote}</span>
+        </div>
       </div>
     </footer>
   )

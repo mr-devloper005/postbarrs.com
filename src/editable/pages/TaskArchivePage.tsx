@@ -98,7 +98,6 @@ export async function EditableTaskArchiveRoute({
 }
 
 export function TaskArchiveView({ task, posts, pagination, category, basePath }: { task: TaskKey; posts: SitePost[]; pagination: SiteFeedPagination; category: string; basePath: string }) {
-  const taskConfig = getTaskConfig(task)
   const voice = taskPageVoices[task]
   const preset = getVisualPreset(visualSystem.recommendedPreset as any)
   const page = pagination.page || 1
@@ -166,7 +165,7 @@ export function TaskArchiveView({ task, posts, pagination, category, basePath }:
 
         <section className="mx-auto max-w-[var(--editable-container)] px-4 pb-16 pt-10 sm:px-6 lg:px-8">
           {posts.length ? (
-            <div className={isArticle ? 'grid items-start gap-6 xl:grid-cols-[minmax(0,1.25fr)_380px]' : deck.archiveClass}>
+            <div className={isArticle ? 'grid items-start gap-5 md:grid-cols-2 xl:grid-cols-3' : deck.archiveClass}>
               {posts.map((post, index) => (
                 <ArchivePostCard key={`${post.id || post.slug}-${index}`} post={post} task={task} basePath={basePath} index={index} />
               ))}
@@ -211,53 +210,37 @@ function ArticleArchiveHero({
   categoryLabel: string
 }) {
   const feature = posts[0]
-  const supporting = posts.slice(1, 4)
 
   return (
     <div className="relative z-10">
-      <span className="inline-block rounded-md bg-[var(--archive-accent)]/10 px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.14em] text-[var(--archive-accent)]">
-        {voice.eyebrow}
-      </span>
-      <h1 className="mt-5 max-w-5xl font-['Georgia','Times_New_Roman',serif] text-5xl font-bold leading-[0.92] tracking-[-0.04em] text-[var(--archive-text)] sm:text-6xl lg:text-[4.5rem]">
+      <div className="flex items-center gap-3">
+        <span className="h-px flex-1 bg-[var(--archive-accent)]/25" />
+        <span className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[var(--archive-accent)]">{voice.eyebrow}</span>
+        <span className="h-px flex-1 bg-[var(--archive-accent)]/25" />
+      </div>
+      <h1 className="mt-6 text-center font-['Georgia','Times_New_Roman',serif] text-4xl font-bold leading-[0.94] tracking-[-0.04em] text-[var(--archive-text)] sm:text-5xl lg:text-[4.2rem]">
         {voice.headline}
       </h1>
-      <p className="mt-5 max-w-2xl text-base leading-7 text-[var(--archive-text)]/65">{voice.description}</p>
+      <p className="mx-auto mt-5 max-w-xl text-center text-[15px] leading-7 text-[var(--archive-text)]/55">{voice.description}</p>
 
       {feature ? (
-        <div className="mt-10 grid gap-5 lg:grid-cols-[1.2fr_0.8fr]">
-          <Link href={`${basePath}/${feature.slug}`} className="group relative min-h-[380px] overflow-hidden rounded-2xl bg-black/10">
-            <img src={getImage(feature)} alt="" className="h-full w-full object-cover transition duration-700 group-hover:scale-105" />
-            <div className="absolute inset-0 bg-[linear-gradient(180deg,transparent_30%,rgba(15,20,17,0.85))]" />
-            <div className="absolute inset-x-0 bottom-0 p-7 sm:p-9">
-              <span className="inline-block rounded-md bg-[var(--archive-accent)] px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-white">
-                {getCategory(feature, 'Featured')}
-              </span>
-              <h2 className="mt-4 max-w-xl font-['Georgia','Times_New_Roman',serif] text-3xl font-bold leading-[1.1] tracking-[-0.02em] text-white sm:text-4xl">
-                {feature.title}
-              </h2>
-              <p className="mt-3 max-w-lg line-clamp-2 text-sm leading-6 text-white/75">{getSummary(feature)}</p>
-            </div>
-          </Link>
-
-          <div className="grid gap-4 content-start">
-            {supporting.map((post, index) => (
-              <Link
-                key={`${post.id || post.slug}-${index}`}
-                href={`${basePath}/${post.slug}`}
-                className="group grid gap-4 rounded-xl border border-[var(--editable-border)] bg-white p-3.5 transition hover:shadow-md sm:grid-cols-[88px_minmax(0,1fr)]"
-              >
-                <div className="relative aspect-square overflow-hidden rounded-lg bg-black/5">
-                  <img src={getImage(post)} alt="" className="h-full w-full object-cover transition duration-500 group-hover:scale-105" />
-                </div>
-                <div className="min-w-0">
-                  <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-[var(--archive-accent)]">{getCategory(post, 'Article')}</p>
-                  <h3 className="mt-1.5 line-clamp-2 font-['Georgia','Times_New_Roman',serif] text-lg font-bold leading-snug tracking-[-0.02em]">{post.title}</h3>
-                  <p className="mt-1.5 line-clamp-2 text-sm leading-relaxed text-[var(--archive-text)]/55">{getSummary(post, 120)}</p>
-                </div>
-              </Link>
-            ))}
+        <Link href={`${basePath}/${feature.slug}`} className="group mt-10 grid gap-0 overflow-hidden rounded-xl border border-[var(--editable-border)] bg-[var(--archive-surface)] shadow-sm transition hover:shadow-lg lg:grid-cols-[1.15fr_0.85fr]">
+          <div className="relative min-h-[320px] overflow-hidden bg-[var(--archive-text)]/5">
+            <img src={getImage(feature)} alt="" className="h-full w-full object-cover transition duration-700 group-hover:scale-[1.03]" />
           </div>
-        </div>
+          <div className="flex flex-col justify-center p-7 sm:p-9">
+            <span className="w-fit border-b-2 border-[var(--archive-accent)] pb-0.5 text-[10px] font-semibold uppercase tracking-[0.16em] text-[var(--archive-accent)]">
+              {getCategory(feature, 'Featured')}
+            </span>
+            <h2 className="mt-4 font-['Georgia','Times_New_Roman',serif] text-2xl font-bold leading-[1.1] tracking-[-0.03em] sm:text-3xl lg:text-4xl">
+              {feature.title}
+            </h2>
+            <p className="mt-4 line-clamp-3 text-sm leading-7 text-[var(--archive-text)]/55">{getSummary(feature)}</p>
+            <span className="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-[var(--archive-accent)] transition group-hover:gap-3">
+              Read article <ArrowRight className="h-3.5 w-3.5" />
+            </span>
+          </div>
+        </Link>
       ) : null}
     </div>
   )
@@ -279,68 +262,34 @@ function ArticleArchiveCardUnique({ post, href, index }: { post: SitePost; href:
   const image = getImage(post)
   const category = getCategory(post, 'Article')
 
-  if (index === 0) {
-    return (
-      <div className="hidden" />
-    )
-  }
+  if (index === 0) return <div className="hidden" />
 
-  if (index === 1) {
+  if (index % 7 === 1) {
     return (
-      <Link
-        href={href}
-        className="group self-start overflow-hidden rounded-2xl border border-[var(--editable-border)] bg-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-lg xl:row-span-2"
-      >
-        <div className="relative aspect-[4/3] overflow-hidden">
-          <img src={image} alt="" className="h-full w-full object-cover transition duration-700 group-hover:scale-105" />
-          <div className="absolute inset-0 bg-[linear-gradient(180deg,transparent_50%,rgba(0,0,0,0.04))]" />
+      <Link href={href} className="group col-span-full grid gap-0 overflow-hidden rounded-xl border border-[var(--editable-border)] bg-[var(--archive-surface)] transition hover:shadow-lg md:grid-cols-[0.55fr_0.45fr]">
+        <div className="relative min-h-[260px] overflow-hidden bg-[var(--archive-text)]/5">
+          <img src={image} alt="" className="h-full w-full object-cover transition duration-700 group-hover:scale-[1.03]" />
         </div>
-        <div className="p-6">
-          <span className="inline-block rounded-md bg-[var(--archive-accent)]/10 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-[var(--archive-accent)]">
-            Editor&apos;s pick
-          </span>
-          <h2 className="mt-3 font-['Georgia','Times_New_Roman',serif] text-2xl font-bold leading-tight tracking-[-0.02em] sm:text-3xl">{post.title}</h2>
-          <p className="mt-3 line-clamp-4 text-sm leading-7 text-[var(--archive-text)]/65">{getSummary(post)}</p>
-          <span className="mt-5 inline-flex items-center gap-1.5 text-sm font-semibold text-[var(--archive-accent)]">
-            Read article <ArrowRight className="h-3.5 w-3.5" />
-          </span>
-        </div>
-      </Link>
-    )
-  }
-
-  if (index % 5 === 0) {
-    return (
-      <Link
-        href={href}
-        className="group grid self-start gap-0 overflow-hidden rounded-2xl border border-[var(--editable-border)] bg-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-lg md:grid-cols-[200px_minmax(0,1fr)]"
-      >
-        <div className="relative min-h-[200px] overflow-hidden bg-black/5">
-          <img src={image} alt="" className="h-full w-full object-cover transition duration-700 group-hover:scale-105" />
-        </div>
-        <div className="p-5">
-          <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-[var(--archive-accent)]">{category}</p>
-          <h2 className="mt-2 font-['Georgia','Times_New_Roman',serif] text-xl font-bold leading-tight tracking-[-0.02em]">{post.title}</h2>
-          <p className="mt-2.5 line-clamp-3 text-sm leading-6 text-[var(--archive-text)]/60">{getSummary(post)}</p>
+        <div className="flex flex-col justify-center p-6 sm:p-8">
+          <span className="w-fit border-b-2 border-[var(--archive-accent)] pb-0.5 text-[10px] font-semibold uppercase tracking-[0.16em] text-[var(--archive-accent)]">{category}</span>
+          <h2 className="mt-4 font-['Georgia','Times_New_Roman',serif] text-2xl font-bold leading-[1.1] tracking-[-0.03em] sm:text-3xl">{post.title}</h2>
+          <p className="mt-3 line-clamp-3 text-sm leading-7 text-[var(--archive-text)]/55">{getSummary(post)}</p>
+          <span className="mt-5 inline-flex items-center gap-2 text-sm font-semibold text-[var(--archive-accent)]">Read article <ArrowRight className="h-3.5 w-3.5" /></span>
         </div>
       </Link>
     )
   }
 
   return (
-    <Link
-      href={href}
-      className="group self-start overflow-hidden rounded-2xl border border-[var(--editable-border)] bg-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-lg"
-    >
-      <div className="relative aspect-[5/4] overflow-hidden bg-black/5">
-        <img src={image} alt="" className="h-full w-full object-cover transition duration-700 group-hover:scale-105" />
+    <Link href={href} className="group flex flex-col self-start overflow-hidden rounded-xl border border-[var(--editable-border)] bg-[var(--archive-surface)] transition hover:shadow-lg">
+      <div className="relative aspect-[3/2] overflow-hidden bg-[var(--archive-text)]/5">
+        <img src={image} alt="" className="h-full w-full object-cover transition duration-700 group-hover:scale-[1.03]" />
       </div>
-      <div className="p-5">
-        <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-[var(--archive-accent)]">{category}</p>
-        <h2 className="mt-2 line-clamp-3 font-['Georgia','Times_New_Roman',serif] text-xl font-bold leading-tight tracking-[-0.02em]">
-          {post.title}
-        </h2>
-        <p className="mt-2.5 line-clamp-3 text-sm leading-6 text-[var(--archive-text)]/60">{getSummary(post)}</p>
+      <div className="flex flex-1 flex-col p-5">
+        <span className="w-fit text-[10px] font-semibold uppercase tracking-[0.16em] text-[var(--archive-accent)]">{category}</span>
+        <h2 className="mt-2.5 line-clamp-3 font-['Georgia','Times_New_Roman',serif] text-xl font-bold leading-snug tracking-[-0.02em]">{post.title}</h2>
+        <p className="mt-2.5 line-clamp-2 text-sm leading-6 text-[var(--archive-text)]/55">{getSummary(post, 140)}</p>
+        <span className="mt-auto pt-4 inline-flex items-center gap-1.5 text-[13px] font-semibold text-[var(--archive-accent)]">Read <ArrowRight className="h-3 w-3" /></span>
       </div>
     </Link>
   )

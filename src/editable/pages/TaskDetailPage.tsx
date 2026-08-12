@@ -170,66 +170,79 @@ function BackLink({ task }: { task: TaskKey }) {
 function ArticleDetail({ post, related, comments }: { post: SitePost; related: SitePost[]; comments: Array<{ id: string; name: string; comment: string; createdAt: string }> }) {
   const images = getImages(post)
   const tags = getTagList(post)
-  const body = getBody(post)
-  
+  const readMin = estimateReadMinutes(post)
+  const date = formatDetailDate(post.createdAt)
+  const category = (Array.isArray(post.tags) && post.tags[0]) || ''
+
   return (
-    <section className="mx-auto max-w-[var(--editable-container)] px-4 py-10 sm:px-6 lg:px-8 lg:py-16">
-      <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_360px]">
-        <article className="min-w-0 overflow-hidden rounded-[2.8rem] border border-[var(--editable-border)] bg-[var(--detail-surface)] shadow-[var(--editable-shadow-strong)]">
-          <div className="relative border-b border-[var(--editable-border)] bg-[linear-gradient(135deg,rgba(178,201,173,0.26),rgba(255,255,255,0.98)_42%,rgba(238,241,231,0.86))] px-5 py-6 sm:px-8 lg:px-12 lg:py-10">
-            <div className="absolute right-6 top-6 hidden rounded-full border border-[var(--editable-border)] bg-white/84 px-4 py-2 text-[10px] font-black uppercase tracking-[0.18em] text-[var(--detail-accent)] shadow-sm md:block">
-              Feature article
-            </div>
-            <BackLink task="article" />
+    <section>
+      <div className="mx-auto max-w-4xl px-4 pt-10 sm:px-6 lg:px-8">
+        <BackLink task="article" />
+      </div>
 
-            <div className="mt-6 grid gap-8 lg:grid-cols-[1.08fr_0.92fr] lg:items-end">
-              <div>
-                <h1 className="max-w-4xl font-['Georgia','Times_New_Roman',serif] text-4xl font-bold leading-[0.92] tracking-[-0.06em] sm:text-5xl lg:text-[5.1rem]">
-                  {post.title}
-                </h1>
-                
-              </div>
-              
-            </div>
-            {tags.length ? (
-              <div className="mt-6 flex flex-wrap gap-2">
-                {tags.map((tag) => (
-                  <span key={tag} className="rounded-full border border-[var(--editable-border)] bg-[var(--slot4-warm)] px-3 py-1.5 text-[10px] font-black uppercase tracking-[0.16em] text-[var(--slot4-soft-muted-text)]">
-                    {tag}
-                  </span>
-                ))}
-              </div>
-            ) : null}
+      {images[0] ? (
+        <div className="mx-auto mt-6 max-w-4xl px-4 sm:px-6 lg:px-8">
+          <div className="overflow-hidden rounded-xl">
+            <img src={images[0]} alt="" className="aspect-[16/9] w-full object-cover" />
           </div>
+        </div>
+      ) : null}
 
-          {images[0] ? (
-            <div className="border-b border-[var(--editable-border)] bg-[var(--slot4-warm)] px-5 py-5 sm:px-8 lg:px-12">
-              <div className="grid gap-4 lg:grid-cols-[1.18fr_0.82fr]">
-                <img src={images[0]} alt="" className="max-h-[700px] w-full rounded-[1.9rem] object-cover shadow-[0_22px_60px_rgba(35,48,39,0.12)]" />
-                <div className="grid gap-4">
-                  <div className="rounded-[1.6rem] border border-[var(--editable-border)] bg-white p-5">
-                    <p className="text-[10px] font-black uppercase tracking-[0.18em] text-[var(--detail-accent)]">Story lens</p>
-                    <p className="mt-4 text-sm leading-7 text-[var(--slot4-muted-text)]">
-                      A more magazine-like layout for longer reading, with the key context visible before the main body begins.
-                    </p>
-                  </div>
-                  {images[1] ? <img src={images[1]} alt="" className="h-full min-h-[220px] w-full rounded-[1.6rem] object-cover shadow-sm" /> : null}
-                </div>
-              </div>
+      <article className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
+        <header className="mt-8 border-b border-[var(--editable-border)] pb-8">
+          {category ? (
+            <span className="inline-block border-b-2 border-[var(--detail-accent)] pb-0.5 text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--detail-accent)]">{category}</span>
+          ) : null}
+          <h1 className="mt-4 font-['Georgia','Times_New_Roman',serif] text-3xl font-bold leading-[1.05] tracking-[-0.04em] sm:text-4xl lg:text-5xl">
+            {post.title}
+          </h1>
+          <div className="mt-5 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-[var(--detail-text)]/50">
+            {date ? <span>{date}</span> : null}
+            {date && readMin ? <span className="hidden sm:inline">&middot;</span> : null}
+            <span>{readMin} min read</span>
+          </div>
+          {tags.length ? (
+            <div className="mt-5 flex flex-wrap gap-2">
+              {tags.map((tag) => (
+                <span key={tag} className="rounded-full border border-[var(--editable-border)] px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-[var(--detail-text)]/60">{tag}</span>
+              ))}
             </div>
           ) : null}
+        </header>
 
-          <div className="px-5 py-8 sm:px-8 lg:px-12 lg:py-10">
-            <div className="min-w-0">
-              <div className="rounded-[2rem] border border-[var(--editable-border)] bg-white p-6 shadow-sm sm:p-8">
-                <BodyContent post={post} />
-              </div>
-              <EditableComments slug={post.slug} comments={comments} />
-            </div>
+        {images.length > 1 ? (
+          <div className="mt-8 grid gap-3 sm:grid-cols-2">
+            {images.slice(1, 5).map((img, i) => (
+              <img key={`${img}-${i}`} src={img} alt="" className="aspect-[4/3] w-full rounded-lg object-cover" />
+            ))}
           </div>
-        </article>
-        <RelatedPanel task="article" post={post} related={related} />
-      </div>
+        ) : null}
+
+        <div className="mt-8 lg:mt-10">
+          <BodyContent post={post} />
+        </div>
+
+        <EditableComments slug={post.slug} comments={comments} />
+      </article>
+
+      {related.length ? (
+        <div className="mx-auto mt-14 max-w-[var(--editable-container)] border-t border-[var(--editable-border)] px-4 pb-16 pt-10 sm:px-6 lg:px-8">
+          <h2 className="font-['Georgia','Times_New_Roman',serif] text-2xl font-bold tracking-[-0.03em]">More to read</h2>
+          <div className="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+            {related.map((item) => (
+              <Link key={item.id || item.slug} href={buildPostUrl('article', item.slug)} className="group overflow-hidden rounded-xl border border-[var(--editable-border)] bg-[var(--detail-surface)] transition hover:shadow-lg">
+                <div className="aspect-[3/2] overflow-hidden bg-[var(--detail-text)]/5">
+                  <img src={getImages(item)[0] || '/placeholder.svg?height=400&width=600'} alt="" className="h-full w-full object-cover transition duration-500 group-hover:scale-[1.03]" />
+                </div>
+                <div className="p-4">
+                  <h3 className="line-clamp-2 font-['Georgia','Times_New_Roman',serif] text-[15px] font-bold leading-snug tracking-[-0.02em]">{item.title}</h3>
+                  <p className="mt-2 line-clamp-2 text-xs leading-5 text-[var(--detail-text)]/50">{summaryText(item)}</p>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </div>
+      ) : null}
     </section>
   )
 }
@@ -493,21 +506,21 @@ function RelatedCard({ task, post }: { task: TaskKey; post: SitePost }) {
   )
 }
 
-function EditableComments({ slug, comments }: { slug: string; comments: Array<{ id: string; name: string; comment: string; createdAt: string }> }) {
+function EditableComments({ comments }: { slug: string; comments: Array<{ id: string; name: string; comment: string; createdAt: string }> }) {
   return (
-    <section className="mt-10 rounded-[2rem] border border-[var(--editable-border)] bg-[var(--slot4-warm)] p-5 sm:p-6">
-      <div className="flex items-center gap-2 text-lg font-black"><MessageCircle className="h-5 w-5" /> Comments</div>
-      <div className="mt-5 grid gap-3">
+    <section className="mt-10 border-t border-[var(--editable-border)] pt-8">
+      <div className="flex items-center gap-2 text-lg font-bold"><MessageCircle className="h-5 w-5" /> Comments</div>
+      <div className="mt-5 grid gap-4">
         {comments.slice(0, 5).map((comment) => (
-          <div key={comment.id} className="rounded-[1.4rem] border border-[var(--editable-border)] bg-white p-4">
-            <div className="flex items-start justify-between gap-3">
-              <p className="text-sm font-black">{comment.name}</p>
-              <span className="text-[10px] font-black uppercase tracking-[0.14em] text-[var(--slot4-soft-muted-text)]">Reader</span>
+          <div key={comment.id} className="border-b border-[var(--editable-border)] pb-4 last:border-0">
+            <div className="flex items-center justify-between gap-3">
+              <p className="text-sm font-bold">{comment.name}</p>
+              <span className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[var(--detail-text)]/40">{formatDetailDate(comment.createdAt)}</span>
             </div>
-            <p className="mt-2 text-sm leading-6 opacity-70">{comment.comment}</p>
+            <p className="mt-2 text-sm leading-6 text-[var(--detail-text)]/65">{comment.comment}</p>
           </div>
         ))}
-        {!comments.length ? <p className="text-sm opacity-60">No comments yet for {slug}.</p> : null}
+        {!comments.length ? <p className="text-sm text-[var(--detail-text)]/50">No comments yet.</p> : null}
       </div>
     </section>
   )
